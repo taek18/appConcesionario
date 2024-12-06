@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:proyecto_integrador/views/add_sales_dialog.dart';
+import 'package:proyecto_integrador/views/sales_inventory_screen.dart';
 import '../controllers/sales.dart';
 import '../controllers/vehicle.dart';
 import '../controllers/client.dart';
@@ -60,25 +61,6 @@ class SalesScreenState extends State<SalesScreen> {
           ],
         );
       },
-    );
-  }
-
-  void _showAddSaleDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AddSaleDialog(
-        availableVehicles: vehicleBox.values.toList(),
-        availableClients: clientBox.values.toList(),
-        onAddSale: (vehicle, client, date, paymentType) {
-          final newSale = Sales(
-            vehicle: vehicle,
-            client: client,
-            date: date,
-            paymentType: paymentType,
-          );
-          _addSale(newSale);
-        },
-      ),
     );
   }
 
@@ -150,7 +132,26 @@ class SalesScreenState extends State<SalesScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddSaleDialog,
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const InventoryScreenForSales(),
+            ),
+          );
+
+          if (result != null) {
+            final newSale = Sales(
+              vehicle: result['vehicle'],
+              client: result['client'],
+              date: result['date'],
+              paymentType: result['paymentType'],
+            );
+            _addSale(newSale);
+          } else {
+            debugPrint('No se recibió ningún resultado.');
+          }
+        },
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.add, color: Colors.white),
       ),

@@ -4,7 +4,9 @@ import '../controllers/vehicle.dart';
 import '../controllers/client.dart';
 
 class AddSaleDialog extends StatefulWidget {
-  final void Function(Vehicle vehicle, Client client, DateTime date, String paymentType) onAddSale;
+  final void Function(
+          Vehicle vehicle, Client client, DateTime date, String paymentType)
+      onAddSale;
   final List<Vehicle> availableVehicles;
   final List<Client> availableClients;
   final Vehicle? initialVehicle;
@@ -49,26 +51,22 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(widget.initialVehicle == null ? 'Agregar Venta' : 'Editar Venta'),
+      title: Text(
+          widget.initialVehicle == null ? 'Agregar Venta' : 'Editar Venta'),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DropdownButtonFormField<Vehicle>(
-              value: selectedVehicle,
-              decoration: const InputDecoration(labelText: 'Vehículo'),
-              items: widget.availableVehicles.map((Vehicle vehicle) {
-                return DropdownMenuItem<Vehicle>(
-                  value: vehicle,
-                  child: Text(vehicle.name),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedVehicle = newValue!;
-                });
-              },
-            ),
+            selectedVehicle != null
+                ? Text(
+                    'Vehículo: ${selectedVehicle!.name} (${selectedVehicle!.model})',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  )
+                : const Text(
+                    'No se ha seleccionado ningún vehículo.',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
             DropdownButtonFormField<Client>(
               value: selectedClient,
               decoration: const InputDecoration(labelText: 'Cliente'),
@@ -97,7 +95,8 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
                 );
                 if (pickedDate != null) {
                   setState(() {
-                    dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                    dateController.text =
+                        DateFormat('yyyy-MM-dd').format(pickedDate);
                   });
                 }
               },
@@ -130,21 +129,30 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
             if (selectedVehicle != null &&
                 selectedClient != null &&
                 dateController.text.isNotEmpty) {
+              final saleData = {
+                'vehicle': selectedVehicle,
+                'client': selectedClient,
+                'date': DateTime.parse(dateController.text),
+                'paymentType': paymentType,
+              };
+              
               widget.onAddSale(
                 selectedVehicle!,
                 selectedClient!,
                 DateTime.parse(dateController.text),
                 paymentType,
               );
-              Navigator.of(context).pop();
+
+              Navigator.of(context).pop(saleData);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Por favor, completa todos los campos')),
+                const SnackBar(
+                    content: Text('Por favor, completa todos los campos')),
               );
             }
           },
           child: const Text('Guardar'),
-        ),
+        )
       ],
     );
   }
