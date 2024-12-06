@@ -18,10 +18,14 @@ class Sales extends HiveObject {
   @HiveField(3)
   late String paymentType;
 
+  @HiveField(4)
+  late double price;
+
   Sales({
     required this.vehicle,
     required this.client,
     required this.date,
     required this.paymentType,
+    required this.price,
   });
 }

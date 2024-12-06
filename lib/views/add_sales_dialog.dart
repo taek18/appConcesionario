@@ -4,15 +4,15 @@ import '../controllers/vehicle.dart';
 import '../controllers/client.dart';
 
 class AddSaleDialog extends StatefulWidget {
-  final void Function(
-          Vehicle vehicle, Client client, DateTime date, String paymentType)
-      onAddSale;
+  final void Function(Vehicle vehicle, Client client, DateTime date,
+      String paymentType, double price) onAddSale;
   final List<Vehicle> availableVehicles;
   final List<Client> availableClients;
   final Vehicle? initialVehicle;
   final Client? initialClient;
   final DateTime? initialDate;
   final String? initialPaymentType;
+  final double? initialPrice;
 
   const AddSaleDialog({
     super.key,
@@ -23,6 +23,7 @@ class AddSaleDialog extends StatefulWidget {
     this.initialClient,
     this.initialDate,
     this.initialPaymentType,
+    this.initialPrice,
   });
 
   @override
@@ -34,6 +35,7 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
   late Client? selectedClient;
   late TextEditingController dateController;
   late String paymentType;
+  late TextEditingController priceController;
 
   @override
   void initState() {
@@ -46,6 +48,11 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
           : '',
     );
     paymentType = widget.initialPaymentType ?? 'Efectivo';
+    priceController = TextEditingController(
+      text: widget.initialPrice != null
+          ? widget.initialPrice!.toStringAsFixed(2)
+          : '',
+    );
   }
 
   @override
@@ -116,6 +123,14 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
                 });
               },
             ),
+            TextField(
+              controller: priceController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Precio'),
+              onChanged: (value) {
+                setState(() {});
+              },
+            ),
           ],
         ),
       ),
@@ -128,21 +143,32 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
           onPressed: () {
             if (selectedVehicle != null &&
                 selectedClient != null &&
-                dateController.text.isNotEmpty) {
+                dateController.text.isNotEmpty &&
+                priceController.text.isNotEmpty) {
+              final price = double.tryParse(priceController.text);
               final saleData = {
                 'vehicle': selectedVehicle,
                 'client': selectedClient,
                 'date': DateTime.parse(dateController.text),
                 'paymentType': paymentType,
+                'price': price,
               };
-              widget.onAddSale(
-                selectedVehicle!,
-                selectedClient!,
-                DateTime.parse(dateController.text),
-                paymentType,
-              );
-
-              Navigator.of(context).pop(saleData);
+              
+              if (price != null && price > 0) {
+                widget.onAddSale(
+                  selectedVehicle!,
+                  selectedClient!,
+                  DateTime.parse(dateController.text),
+                  paymentType,
+                  price,
+                );
+                Navigator.of(context).pop(saleData);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Por favor, ingresa un precio válido')),
+                );
+              }
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

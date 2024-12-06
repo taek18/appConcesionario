@@ -4,15 +4,15 @@ import '../controllers/vehicle.dart';
 import '../controllers/client.dart';
 
 class EditSaleDialog extends StatefulWidget {
-  final void Function(
-          Vehicle vehicle, Client client, DateTime date, String paymentType)
-      onUpdateSale;
+  final void Function(Vehicle vehicle, Client client, DateTime date,
+      String paymentType, double price) onUpdateSale;
   final List<Vehicle> availableVehicles;
   final List<Client> availableClients;
   final Vehicle initialVehicle;
   final Client initialClient;
   final DateTime initialDate;
   final String initialPaymentType;
+  final double initialPrice;
 
   const EditSaleDialog({
     super.key,
@@ -23,6 +23,7 @@ class EditSaleDialog extends StatefulWidget {
     required this.initialClient,
     required this.initialDate,
     required this.initialPaymentType,
+    required this.initialPrice,
   });
 
   @override
@@ -33,7 +34,9 @@ class _EditSaleDialogState extends State<EditSaleDialog> {
   late Vehicle selectedVehicle;
   late Client selectedClient;
   late TextEditingController dateController;
+  late TextEditingController priceController;
   late String paymentType;
+  late double price;
 
   @override
   void initState() {
@@ -42,6 +45,9 @@ class _EditSaleDialogState extends State<EditSaleDialog> {
     selectedClient = widget.initialClient;
     dateController = TextEditingController(
       text: DateFormat('yyyy-MM-dd').format(widget.initialDate),
+    );
+    priceController = TextEditingController(
+      text: widget.initialPrice.toStringAsFixed(2),
     );
     paymentType = widget.initialPaymentType;
   }
@@ -118,6 +124,16 @@ class _EditSaleDialogState extends State<EditSaleDialog> {
                 });
               },
             ),
+            TextField(
+              controller: priceController,
+              decoration: const InputDecoration(labelText: 'Precio'),
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              onChanged: (value) {
+                setState(() {
+                  price = double.tryParse(value) ?? 0.0;
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -134,6 +150,7 @@ class _EditSaleDialogState extends State<EditSaleDialog> {
                 selectedClient,
                 DateTime.parse(dateController.text),
                 paymentType,
+                price,
               );
 
               Navigator.of(context).pop();

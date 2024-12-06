@@ -74,12 +74,14 @@ class SalesScreenState extends State<SalesScreen> {
         initialClient: sale.client,
         initialDate: sale.date,
         initialPaymentType: sale.paymentType,
-        onUpdateSale: (vehicle, client, date, paymentType) {
+        initialPrice: sale.price,
+        onUpdateSale: (vehicle, client, date, paymentType, price) {
           final updatedSale = Sales(
             vehicle: vehicle,
             client: client,
             date: date,
             paymentType: paymentType,
+            price: price,
           );
           _editSale(index, updatedSale);
         },
@@ -123,7 +125,11 @@ class SalesScreenState extends State<SalesScreen> {
               return ListTile(
                 title: Text('Cliente: ${sale.client.name}'),
                 subtitle: Text(
-                    'Vehículo: ${sale.vehicle.name}\nFecha: ${DateFormat('yyyy-MM-dd').format(sale.date)}\nForma de Pago: ${sale.paymentType}'),
+                  'Vehículo: ${sale.vehicle.name}\n'
+                  'Fecha: ${DateFormat('yyyy-MM-dd').format(sale.date)}\n'
+                  'Forma de Pago: ${sale.paymentType}\n'
+                  'Precio: \$${sale.price.toStringAsFixed(2)}',
+                ),
                 onTap: () => _showEditSaleDialog(index, sale),
                 onLongPress: () => _deleteSale(index),
               );
@@ -146,6 +152,7 @@ class SalesScreenState extends State<SalesScreen> {
               client: result['client'],
               date: result['date'],
               paymentType: result['paymentType'],
+              price: result['price'],
             );
             _addSale(newSale);
           } else {

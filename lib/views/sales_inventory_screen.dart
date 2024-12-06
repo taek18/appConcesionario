@@ -33,12 +33,13 @@ class InventoryScreenForSalesState extends State<InventoryScreenForSales> {
             availableVehicles: [vehicle],
             availableClients: clientBox.values.toList(),
             initialVehicle: vehicle,
-            onAddSale: (vehicle, client, date, paymentType) {
+            onAddSale: (vehicle, client, date, paymentType, price) {
               final newSale = {
                 'vehicle': vehicle,
                 'client': client,
                 'date': date,
                 'paymentType': paymentType,
+                'price': price,
               };
               Navigator.of(context).pop(newSale);
             },
