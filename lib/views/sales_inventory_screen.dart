@@ -83,7 +83,14 @@ class InventoryScreenForSalesState extends State<InventoryScreenForSales> {
                 child: ListTile(
                   title: Text(vehicle.name),
                   subtitle: Text(vehicle.model),
-                  leading: Image.asset(vehicle.imagePath),
+                  leading: Container(
+                    width: 80,  // Definir un ancho constante para la imagen
+                    height: 80, // Definir una altura constante para la imagen
+                    child: Image.asset(
+                      vehicle.imagePath,
+                      fit: BoxFit.cover,  // Asegura que la imagen no se distorsione
+                    ),
+                  ),
                 ),
               );
             },
