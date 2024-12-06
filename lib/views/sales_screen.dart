@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:proyecto_integrador/views/add_sales_dialog.dart';
+import 'package:proyecto_integrador/views/edit_sale_dialog.dart';
 import 'package:proyecto_integrador/views/sales_inventory_screen.dart';
 import '../controllers/sales.dart';
 import '../controllers/vehicle.dart';
@@ -67,14 +67,14 @@ class SalesScreenState extends State<SalesScreen> {
   void _showEditSaleDialog(int index, Sales sale) {
     showDialog(
       context: context,
-      builder: (context) => AddSaleDialog(
+      builder: (context) => EditSaleDialog(
         availableVehicles: vehicleBox.values.toList(),
         availableClients: clientBox.values.toList(),
         initialVehicle: sale.vehicle,
         initialClient: sale.client,
         initialDate: sale.date,
         initialPaymentType: sale.paymentType,
-        onAddSale: (vehicle, client, date, paymentType) {
+        onUpdateSale: (vehicle, client, date, paymentType) {
           final updatedSale = Sales(
             vehicle: vehicle,
             client: client,

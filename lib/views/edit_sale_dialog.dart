@@ -3,35 +3,35 @@ import 'package:intl/intl.dart';
 import '../controllers/vehicle.dart';
 import '../controllers/client.dart';
 
-class AddSaleDialog extends StatefulWidget {
+class EditSaleDialog extends StatefulWidget {
   final void Function(
           Vehicle vehicle, Client client, DateTime date, String paymentType)
-      onAddSale;
+      onUpdateSale;
   final List<Vehicle> availableVehicles;
   final List<Client> availableClients;
-  final Vehicle? initialVehicle;
-  final Client? initialClient;
-  final DateTime? initialDate;
-  final String? initialPaymentType;
+  final Vehicle initialVehicle;
+  final Client initialClient;
+  final DateTime initialDate;
+  final String initialPaymentType;
 
-  const AddSaleDialog({
+  const EditSaleDialog({
     super.key,
-    required this.onAddSale,
+    required this.onUpdateSale,
     required this.availableVehicles,
     required this.availableClients,
-    this.initialVehicle,
-    this.initialClient,
-    this.initialDate,
-    this.initialPaymentType,
+    required this.initialVehicle,
+    required this.initialClient,
+    required this.initialDate,
+    required this.initialPaymentType,
   });
 
   @override
-  State<AddSaleDialog> createState() => _AddSaleDialogState();
+  State<EditSaleDialog> createState() => _EditSaleDialogState();
 }
 
-class _AddSaleDialogState extends State<AddSaleDialog> {
-  late Vehicle? selectedVehicle;
-  late Client? selectedClient;
+class _EditSaleDialogState extends State<EditSaleDialog> {
+  late Vehicle selectedVehicle;
+  late Client selectedClient;
   late TextEditingController dateController;
   late String paymentType;
 
@@ -41,32 +41,34 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
     selectedVehicle = widget.initialVehicle;
     selectedClient = widget.initialClient;
     dateController = TextEditingController(
-      text: widget.initialDate != null
-          ? DateFormat('yyyy-MM-dd').format(widget.initialDate!)
-          : '',
+      text: DateFormat('yyyy-MM-dd').format(widget.initialDate),
     );
-    paymentType = widget.initialPaymentType ?? 'Efectivo';
+    paymentType = widget.initialPaymentType;
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(
-          widget.initialVehicle == null ? 'Agregar Venta' : 'Agregar Venta'),
+      title: const Text('Editar Venta'),
       content: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            selectedVehicle != null
-                ? Text(
-                    'Vehículo: ${selectedVehicle!.name} (${selectedVehicle!.model})',
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
-                  )
-                : const Text(
-                    'No se ha seleccionado ningún vehículo.',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
+            DropdownButtonFormField<Vehicle>(
+              value: selectedVehicle,
+              decoration: const InputDecoration(labelText: 'Vehículo'),
+              items: widget.availableVehicles.map((Vehicle vehicle) {
+                return DropdownMenuItem<Vehicle>(
+                  value: vehicle,
+                  child: Text('${vehicle.name} (${vehicle.model})'),
+                );
+              }).toList(),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedVehicle = newValue!;
+                });
+              },
+            ),
             DropdownButtonFormField<Client>(
               value: selectedClient,
               decoration: const InputDecoration(labelText: 'Cliente'),
@@ -126,23 +128,15 @@ class _AddSaleDialogState extends State<AddSaleDialog> {
         ),
         TextButton(
           onPressed: () {
-            if (selectedVehicle != null &&
-                selectedClient != null &&
-                dateController.text.isNotEmpty) {
-              final saleData = {
-                'vehicle': selectedVehicle,
-                'client': selectedClient,
-                'date': DateTime.parse(dateController.text),
-                'paymentType': paymentType,
-              };
-              widget.onAddSale(
-                selectedVehicle!,
-                selectedClient!,
+            if (dateController.text.isNotEmpty) {
+              widget.onUpdateSale(
+                selectedVehicle,
+                selectedClient,
                 DateTime.parse(dateController.text),
                 paymentType,
               );
 
-              Navigator.of(context).pop(saleData);
+              Navigator.of(context).pop();
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
